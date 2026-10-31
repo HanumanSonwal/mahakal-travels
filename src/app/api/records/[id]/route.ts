@@ -1,0 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB } from '@/lib/db';
+import { DailyRecord } from '@/lib/models';
+import { SESSION_COOKIE, verifySessionToken } from '@/lib/auth';
+type Context={params:Promise<{id:string}>};
+export async function PUT(req:NextRequest,{params}:Context) { if(verifySessionToken(req.cookies.get(SESSION_COOKIE)?.value)?.role !== 'admin')return NextResponse.json({error:'Please sign in to continue.'},{status:401});try { const {id}=await params; const body=await req.json(); await connectDB(); const record=await DailyRecord.findByIdAndUpdate(id,body,{new:true,runValidators:true}); if(!record)return NextResponse.json({error:'Record not found'},{status:404}); return NextResponse.json(record); } catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Could not update record'},{status:400});} }
+export async function DELETE(req:NextRequest,{params}:Context) { if(verifySessionToken(req.cookies.get(SESSION_COOKIE)?.value)?.role !== 'admin')return NextResponse.json({error:'Please sign in to continue.'},{status:401});try { const {id}=await params; await connectDB(); const record=await DailyRecord.findByIdAndDelete(id); if(!record)return NextResponse.json({error:'Record not found'},{status:404}); return NextResponse.json({ok:true}); } catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Could not delete record'},{status:400});} }

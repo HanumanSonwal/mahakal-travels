@@ -1,0 +1,20 @@
+import mongoose, { Schema } from 'mongoose';
+
+const CustomExpenseSchema = new Schema({ name: { type: String, required: true, trim: true, maxlength: 80 }, amount: { type: Number, required: true, min: 0 } }, { _id: false });
+const DailyRecordSchema = new Schema({
+  date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ }, status: { type: String, enum: ['Completed Trip', 'No Trip', 'Holiday'], default: 'Completed Trip' },
+  collection: { type: Number, min: 0, default: 0 }, cng: { type: Number, min: 0, default: 0 }, toll: { type: Number, min: 0, default: 0 }, parking: { type: Number, min: 0, default: 0 }, food: { type: Number, min: 0, default: 0 }, maintenance: { type: Number, min: 0, default: 0 }, other: { type: Number, min: 0, default: 0 }, customExpenses: { type: [CustomExpenseSchema], default: [] }, notes: { type: String, maxlength: 1000, default: '' }, description: { type: String, maxlength: 500, default: '' }
+}, { timestamps: true, suppressReservedKeysWarning: true });
+DailyRecordSchema.index({ date: 1 }, { unique: true });
+
+const SettingsSchema = new Schema({ vehicleName: { type: String, default: 'Suzuki Eeco', trim: true }, monthlyEmi: { type: Number, default: 13500, min: 0 }, monthlyDriverSalary: { type: Number, default: 15000, min: 0 }, currency: { type: String, default: 'INR' }, businessStartDate: { type: String, default: '' } }, { timestamps: true });
+const UserSchema = new Schema({ name: { type: String, required: true, trim: true, maxlength: 80 }, email: { type: String, required: true, unique: true, lowercase: true, trim: true }, phone: { type: String, trim: true, maxlength: 20, default: '' }, passwordHash: { type: String, required: true }, role: { type: String, enum: ['admin','customer'], default: 'admin' }, accountKey: { type: String, required: true, unique: true, default: 'owner' } }, { timestamps: true });
+const TripSchema = new Schema({ origin: { type: String, required: true, trim: true, maxlength: 100 }, destination: { type: String, required: true, trim: true, maxlength: 100 }, tripType: { type: String, enum: ['ONE_WAY','ROUND_TRIP'], default: 'ONE_WAY' }, date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ }, departureTime: { type: String, required: true, match: /^\d{2}:\d{2}$/ }, arrivalTime: { type: String, default: '' }, returnDate: { type: String, default: '' }, returnDepartureTime: { type: String, default: '' }, returnArrivalTime: { type: String, default: '' }, farePerSeat: { type: Number, required: true, min: 0 }, totalSeats: { type: Number, required: true, min: 1 }, availableSeats: { type: Number, required: true, min: 0 }, status: { type: String, enum: ['OPEN', 'FULL', 'CANCELLED'], default: 'OPEN' }, notes: { type: String, maxlength: 500, default: '' } }, { timestamps: true });
+TripSchema.index({ date: 1, status: 1 });
+const BookingSchema = new Schema({ bookingCode: { type: String, required: true, unique: true }, trip: { type: Schema.Types.ObjectId, ref: 'Trip', required: true, index: true }, customerId: { type: Schema.Types.ObjectId, ref: 'User', index: true }, customerName: { type: String, required: true, trim: true, maxlength: 100 }, phone: { type: String, required: true, trim: true, maxlength: 20 }, email: { type: String, trim: true, lowercase: true, default: '' }, seats: { type: Number, required: true, min: 1 }, farePerSeat: { type: Number, required: true, min: 0 }, totalFare: { type: Number, required: true, min: 0 }, status: { type: String, enum: ['CONFIRMED', 'CANCELLED'], default: 'CONFIRMED' } }, { timestamps: true });
+
+export const DailyRecord = mongoose.models.DailyRecord || mongoose.model('DailyRecord', DailyRecordSchema);
+export const AppSettings = mongoose.models.AppSettings || mongoose.model('AppSettings', SettingsSchema);
+export const User = mongoose.models.User || mongoose.model('User', UserSchema);
+export const Trip = mongoose.models.Trip || mongoose.model('Trip', TripSchema);
+export const Booking = mongoose.models.Booking || mongoose.model('Booking', BookingSchema);
