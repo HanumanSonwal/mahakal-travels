@@ -11,6 +11,10 @@ function authSecret() {
   return secret;
 }
 
+export function hashCustomerOtp(email: string, otp: string) {
+  return createHmac('sha256', authSecret()).update(`customer-otp:${email}:${otp}`).digest('hex');
+}
+
 export async function hashPassword(password: string) {
   const salt = randomBytes(16);
   const hash = await scrypt(password, salt, 64) as Buffer;
