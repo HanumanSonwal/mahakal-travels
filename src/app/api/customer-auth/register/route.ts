@@ -1,6 +1,70 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
-import { createSessionToken, hashPassword, SESSION_COOKIE, sessionCookieOptions } from '@/lib/auth';
-import { User } from '@/lib/models';
+import {
+  createSessionToken,
+  hashPassword,
+  SESSION_COOKIE,
+  sessionCookieOptions,
+} from "@/lib/auth";
+import { connectDB } from "@/lib/db";
+import { User } from "@/lib/models";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req:NextRequest){try{const body=await req.json(),name=String(body.name||'').trim(),email=String(body.email||'').trim().toLowerCase(),phone=String(body.phone||'').trim(),password=String(body.password||'');if(name.length<2||name.length>80||!/^\S+@\S+\.\S+$/.test(email)||phone.replace(/\D/g,'').length<7||phone.length>20||password.length<10)return NextResponse.json({error:'Enter your name, a valid email, phone number, and a password with at least 10 characters.'},{status:400});await connectDB();const user=await User.create({name,email,phone,passwordHash:await hashPassword(password),role:'customer',accountKey:`customer:${email}`});const response=NextResponse.json({user:{name:user.name,email:user.email,phone:user.phone}},{status:201});response.cookies.set(SESSION_COOKIE,createSessionToken({id:user.id,name:user.name,email:user.email},'customer'),sessionCookieOptions());return response}catch(e){const duplicate=e instanceof Error&&e.message.includes('E11000');return NextResponse.json({error:duplicate?'An account already uses this email. Sign in or use another email.':e instanceof Error?e.message:'Could not create your account.'},{status:duplicate?409:503})}}
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json(),
+      name = String(body.name || "").trim(),
+      email = String(body.email || "")
+        .trim()
+        .toLowerCase(),
+      phone = String(body.phone || "").trim(),
+      password = String(body.password || "");
+    if (
+      name.length < 2 ||
+      name.length > 80 ||
+      !/^\S+@\S+\.\S+$/.test(email) ||
+      phone.replace(/\D/g, "").length < 7 ||
+      phone.length > 20 ||
+      password.length < 10
+    )
+      return NextResponse.json(
+        {
+          error:
+            "Enter your name, a valid email, phone number, and a password with at least 10 characters.",
+        },
+        { status: 400 },
+      );
+    await connectDB();
+    const user = await User.create({
+      name,
+      email,
+      phone,
+      passwordHash: await hashPassword(password),
+      role: "customer",
+      accountKey: `customer:${email}`,
+    });
+    const response = NextResponse.json(
+      { user: { name: user.name, email: user.email, phone: user.phone } },
+      { status: 201 },
+    );
+    response.cookies.set(
+      SESSION_COOKIE,
+      createSessionToken(
+        { id: user.id, name: user.name, email: user.email },
+        "customer",
+      ),
+      sessionCookieOptions(),
+    );
+    return response;
+  } catch (e) {
+    const duplicate = e instanceof Error && e.message.includes("E11000");
+    return NextResponse.json(
+      {
+        error: duplicate
+          ? "An account already uses this email. Sign in or use another email."
+          : e instanceof Error
+            ? e.message
+            : "Could not create your account.",
+      },
+      { status: duplicate ? 409 : 503 },
+    );
+  }
+}
