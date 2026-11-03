@@ -1,6 +1,7 @@
 "use client";
 
 import CustomerFullDayRequests from "@/components/customer-full-day-requests";
+import CustomerAuthPanel from "@/components/customer-auth-panel";
 import { money } from "@/lib/finance";
 import { formatTime12h } from "@/lib/time";
 import {
@@ -68,12 +69,6 @@ export default function CustomerAccountPage() {
   const [user, setUser] = useState<Customer | null>(null),
     [bookings, setBookings] = useState<Booking[]>([]),
     [loading, setLoading] = useState(true),
-    [mode, setMode] = useState<"login" | "signup">("login"),
-    [name, setName] = useState(""),
-    [phone, setPhone] = useState(""),
-    [email, setEmail] = useState(""),
-    [password, setPassword] = useState(""),
-    [confirmPassword, setConfirmPassword] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
@@ -103,9 +98,6 @@ export default function CustomerAccountPage() {
       .then((data) => {
         if (data.user) {
           setUser(data.user);
-          setName(data.user.name);
-          setEmail(data.user.email);
-          setPhone(data.user.phone || "");
           void loadBookings();
         } else {
           if (data.error) setError(data.error);
@@ -119,37 +111,6 @@ export default function CustomerAccountPage() {
         setLoading(false);
       });
   }, [loadBookings]);
-  const submitAuth = async (e: FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    setError("");
-    if (mode === "signup" && password !== confirmPassword) {
-      setError("Passwords do not match.");
-      setBusy(false);
-      return;
-    }
-    try {
-      const endpoint =
-        mode === "signup"
-          ? "/api/customer-auth/register"
-          : "/api/customer-auth/login";
-      const r = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, phone, password }),
-        }),
-        data = await parse(r);
-      if (!r.ok) throw new Error(data.error);
-      const next = new URLSearchParams(window.location.search).get("next");
-      window.location.assign(
-        next?.startsWith("/") && !next.startsWith("//") ? next : "/account",
-      );
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not sign in.");
-    } finally {
-      setBusy(false);
-    }
-  };
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     window.location.assign("/account");
@@ -362,119 +323,10 @@ export default function CustomerAccountPage() {
           )}
         </section>
       ) : (
-        <section className="customer-auth-wrap">
-          <div className="customer-auth-card">
-            <a className="customer-logo" href="/book">
-              <img src="/mahakal-travel.jpg" alt="Mahakal Travel" />
-            </a>
-            <span className="booking-kicker">MAHAKAL TRAVEL ACCOUNT</span>
-            <h1>
-              {mode === "signup" ? "Create your account" : "Welcome back"}
-            </h1>
-            <p>
-              {mode === "signup"
-                ? "Sign up to book trips and manage your reservations."
-                : "Sign in to see and manage your bookings."}
-            </p>
-            {error && <div className="booking-error">{error}</div>}
-            <form className="customer-auth-form" onSubmit={submitAuth}>
-              {mode === "signup" && (
-                <>
-                  <label>
-                    Full name
-                    <input
-                      autoComplete="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      minLength={2}
-                      maxLength={80}
-                      placeholder="Your name"
-                    />
-                  </label>
-                  <label>
-                    Mobile number
-                    <input
-                      autoComplete="tel"
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      required
-                      minLength={7}
-                      maxLength={20}
-                      placeholder="For booking updates"
-                    />
-                  </label>
-                </>
-              )}
-              <label>
-                Email address
-                <input
-                  autoComplete="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="you@example.com"
-                />
-              </label>
-              <label>
-                Password
-                <input
-                  autoComplete={
-                    mode === "signup" ? "new-password" : "current-password"
-                  }
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={mode === "signup" ? 10 : 1}
-                  placeholder={
-                    mode === "signup" ? "At least 10 characters" : ""
-                  }
-                />
-              </label>
-              {mode === "signup" && (
-                <label>
-                  Confirm password
-                  <input
-                    type="password"
-                    autoComplete="new-password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    minLength={10}
-                  />
-                </label>
-              )}
-              <button className="confirm-booking-btn" disabled={busy}>
-                {busy ? (
-                  <LoaderCircle size={16} className="spin" />
-                ) : mode === "signup" ? (
-                  "Create account"
-                ) : (
-                  "Sign in"
-                )}
-              </button>
-            </form>
-            <div className="customer-auth-switch">
-              {mode === "signup"
-                ? "Already have an account?"
-                : "New to Mahakal Travel?"}{" "}
-              <button
-                onClick={() => {
-                  setMode(mode === "signup" ? "login" : "signup");
-                  setError("");
-                }}
-              >
-                {mode === "signup" ? "Sign in" : "Create account"}
-              </button>
-            </div>
-            <a className="customer-back-link" href="/book">
-              ← Back to available trips
-            </a>
-          </div>
-        </section>
+        <>
+          {error && <div className="booking-error">{error}</div>}
+          <CustomerAuthPanel />
+        </>
       )}
       <footer className="booking-footer">
         <span>MAHAKAL TRAVEL · SAFE JOURNEY, BETTER TOMORROW</span>
