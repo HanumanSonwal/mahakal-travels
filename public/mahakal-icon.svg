@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Mahakal Travels">
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#e5636a"/><stop offset="1" stop-color="#b52f37"/>
+  </linearGradient>
+</defs>
+<g transform="translate(0 0)">
+  <rect width="140" height="140" rx="34" fill="url(#g)"/>
+  <path d="M22 121 Q70 97 118 121" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M46 117 Q70 107 94 117" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-dasharray="6 6" stroke-linecap="round"/>
+  <rect x="65.5" y="52" width="9" height="56" rx="4.5" fill="#fff"/>
+  <path d="M40 30 C40 58 52 70 70 70 C88 70 100 58 100 30" fill="none" stroke="#fff" stroke-width="8.5" stroke-linecap="round"/>
+  <path d="M40 22 L46 36 L34 36 Z M100 22 L106 36 L94 36 Z" fill="#fff"/>
+  <path d="M70 16 L80 40 L70 54 L60 40 Z" fill="#ffc94d"/>
+  <rect x="58" y="80" width="24" height="7" rx="3.5" fill="#ffc94d"/>
+</g>
+</svg>

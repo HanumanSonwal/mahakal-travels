@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import BookingPage from './book/page';
 
 export default function Page() {
-  redirect('/book');
+  return <BookingPage />;
 }

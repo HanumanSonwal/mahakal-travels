@@ -2,6 +2,8 @@
 
 import CustomerFullDayRequests from "@/components/customer-full-day-requests";
 import CustomerAuthPanel from "@/components/customer-auth-panel";
+import SiteFooter from "@/components/site-footer";
+import SiteHeader from "@/components/site-header";
 import { money } from "@/lib/finance";
 import { formatTime12h } from "@/lib/time";
 import {
@@ -10,7 +12,6 @@ import {
   Check,
   Clock3,
   LoaderCircle,
-  LogOut,
   Pencil,
   Plus,
   RotateCcw,
@@ -166,18 +167,7 @@ export default function CustomerAccountPage() {
     });
   return (
     <main className="customer-page">
-      <header className="booking-top">
-        <a className="booking-brand" href="/book">
-          <img src="/mahakal-travel.jpg" alt="Mahakal Travel logo" />
-          <span>
-            <b>Mahakal</b>
-            <strong>TRAVEL</strong>
-          </span>
-        </a>
-        <a className="admin-link" href="/book">
-          Find a trip <ArrowRight size={15} />
-        </a>
-      </header>
+      <SiteHeader customer={user} ready={!loading} onLogout={logout} loginHref="/account" />
       {loading ? (
         <div className="trip-loading">
           <LoaderCircle className="spin" size={19} />
@@ -185,7 +175,7 @@ export default function CustomerAccountPage() {
         </div>
       ) : user ? (
         <section className="customer-dashboard">
-          <div className="customer-welcome">
+          <div className="customer-welcome" id="profile">
             <div>
               <span className="booking-kicker">CUSTOMER ACCOUNT</span>
               <h1>Hello, {user.name.split(" ")[0]}.</h1>
@@ -194,10 +184,6 @@ export default function CustomerAccountPage() {
                 to date.
               </p>
             </div>
-            <button className="customer-logout" onClick={logout}>
-              <LogOut size={15} />
-              Log out
-            </button>
           </div>
           {error && <div className="booking-error">{error}</div>}
           {notice && (
@@ -210,12 +196,12 @@ export default function CustomerAccountPage() {
             </div>
           )}
           <CustomerFullDayRequests />
-          <div className="customer-section-head">
+          <div className="customer-section-head" id="my-bookings">
             <div>
               <h2>My bookings</h2>
               <p>Trip times and route below reflect the latest schedule.</p>
             </div>
-            <a className="confirm-booking-btn customer-find-trip" href="/book">
+            <a className="confirm-booking-btn customer-find-trip" href="/">
               <Plus size={15} />
               Book a trip
             </a>
@@ -316,7 +302,7 @@ export default function CustomerAccountPage() {
                 When you reserve a trip, its details and status will appear
                 here.
               </small>
-              <a href="/book" className="book-seat-btn">
+              <a href="/" className="book-seat-btn">
                 Browse available trips <ArrowRight size={15} />
               </a>
             </div>
@@ -328,10 +314,7 @@ export default function CustomerAccountPage() {
           <CustomerAuthPanel />
         </>
       )}
-      <footer className="booking-footer">
-        <span>MAHAKAL TRAVEL · SAFE JOURNEY, BETTER TOMORROW</span>
-        <span>Bookings are tied to your account.</span>
-      </footer>
+      <SiteFooter />
       {editing && (
         <div
           className="booking-modal-backdrop"

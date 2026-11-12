@@ -92,8 +92,8 @@ export default function CustomerAuthPanel() {
   return (
     <section className="customer-auth-wrap">
       <div className="customer-auth-card">
-        <a className="customer-logo" href="/book">
-          <img src="/mahakal-travel.jpg" alt="Mahakal Travel" />
+        <a className="customer-logo" href="/">
+          <img src="/mahakal-logo.svg" alt="Mahakal Travels" />
         </a>
         <span className="booking-kicker">MAHAKAL TRAVEL ACCOUNT</span>
         <h1>Sign in with email</h1>
@@ -163,7 +163,7 @@ export default function CustomerAuthPanel() {
             </button>
           </div>
         )}
-        <a className="customer-back-link" href="/book">← Back to available trips</a>
+        <a className="customer-back-link" href="/">← Back to available trips</a>
       </div>
     </section>
   );
